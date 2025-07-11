@@ -1,9 +1,16 @@
-﻿{
+{
   "name": "strapi-plugin-auto-slug-manager-a-mi13",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Universal auto slug generator for all Strapi content types with full Rich Text support",
   "main": "strapi-server.js",
-  "keywords": ["strapi", "plugin", "slug", "auto-generation", "rich-text", "cyrillic"],
+  "keywords": [
+    "strapi",
+    "plugin",
+    "slug",
+    "auto-generation",
+    "rich-text",
+    "cyrillic"
+  ],
   "author": "A-mi13 <alex-c13@mail.ru>",
   "license": "MIT",
   "repository": {
@@ -22,5 +29,11 @@
   "peerDependencies": {
     "@strapi/strapi": "^5.0.0"
   },
-  "files": ["strapi-server.js", "strapi-admin.js", "admin-page.js", "server/", "README.md"]
+  "files": [
+    "strapi-server.js",
+    "strapi-admin.js",
+    "admin-page.js",
+    "server/",
+    "README.md"
+  ]
 }
