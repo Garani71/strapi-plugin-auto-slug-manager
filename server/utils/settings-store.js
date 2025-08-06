@@ -13,12 +13,30 @@ let settingsStore = {
   slugifyOptions: {
     lower: true,
     strict: true,
-    locale: 'ru'
+    locale: 'ru' // По умолчанию русская локаль
   },
   contentTypes: {}
 };
 
 module.exports = {
+  /**
+   * Инициализирует настройки из конфигурации плагина
+   * @param {object} pluginConfig - конфигурация из config/plugins.ts
+   */
+  initializeSettings(pluginConfig = {}) {
+    settingsStore = {
+      ...settingsStore,
+      ...pluginConfig,
+      // Правильно объединяем slugifyOptions
+      slugifyOptions: {
+        ...settingsStore.slugifyOptions,
+        ...(pluginConfig.slugifyOptions || {})
+      }
+    };
+    console.log('🔧 [Settings Store] Настройки инициализированы из конфигурации плагина:', settingsStore);
+    return { ...settingsStore };
+  },
+
   getSettings() {
     return { ...settingsStore };
   },

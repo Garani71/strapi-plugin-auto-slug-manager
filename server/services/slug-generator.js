@@ -110,11 +110,12 @@ module.exports = ({ strapi }) => ({
       return '';
     }
 
-    // Генерируем базовый слаг
+    // Получаем настройки из хранилища
+    const config = settingsStore.getSettings();
+    
+    // Генерируем базовый слаг с настройками из конфигурации
     const baseSlug = slugify(text, {
-      lower: true,
-      strict: true,
-      locale: 'ru',
+      ...config.slugifyOptions,
       ...options
     });
 

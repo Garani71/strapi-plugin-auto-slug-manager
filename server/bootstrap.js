@@ -1,9 +1,18 @@
 'use strict';
 
+const settingsStore = require('./utils/settings-store');
+
 module.exports = ({ strapi }) => {
   // Регистрируем universal lifecycle хуки при старте Strapi
   const registerSlugLifecycles = () => {
     console.log('🚀 [Auto Slug Manager] Инициализация плагина...');
+    
+    // Получаем конфигурацию плагина из Strapi
+    const pluginConfig = strapi.config.get('plugin.auto-slug-manager') || {};
+    console.log('⚙️ [Auto Slug Manager] Конфигурация плагина:', pluginConfig);
+    
+    // Инициализируем настройки из конфигурации плагина
+    settingsStore.initializeSettings(pluginConfig);
     
     const slugService = strapi.plugin('auto-slug-manager').service('slug-generator');
     

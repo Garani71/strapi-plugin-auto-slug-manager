@@ -1,57 +1,22 @@
-# Strapi Plugin: Auto Slug Manager
+# Strapi Plugin Auto Slug Manager
 
-🔗 **Universal auto slug generator for all Strapi v5 content types with full Rich Text support**
-
-[![npm version](https://badge.fury.io/js/strapi-plugin-auto-slug-manager-a-mi13.svg)](https://www.npmjs.com/package/strapi-plugin-auto-slug-manager-a-mi13)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+🔗 Universal auto slug generator for all Strapi content types with Rich Text support
 
 ## ✨ Features
 
-- 🚀 **Universal**: Works with ANY content type that has a `slug` field
-- 🔍 **Auto-discovery**: Automatically finds and processes all content types with slug fields
-- 📝 **Rich Text Support**: Handles both new Blocks editor and classic Rich Text (HTML)
-- 🌐 **Cyrillic Support**: Perfect transliteration for Russian and other Cyrillic languages
-- ⚙️ **Highly Configurable**: Flexible field selection and behavior customization
-- 🎨 **Beautiful Admin UI**: Modern, intuitive settings panel
-- 🔄 **Smart Updates**: Option to update existing slugs or preserve them
-- 🎯 **Unique Slugs**: Automatic suffix generation for duplicates (-1, -2, -3...)
+- **Universal** - Works with ANY content type that has a `slug` field
+- **Rich Text Support** - Extracts text from both Rich Text Blocks (new editor) and classic Rich Text (HTML) fields
+- **Multiple Field Types** - Supports string, Rich Text Blocks, and classic Rich Text fields
+- **Cyrillic Support** - Proper transliteration of Russian/Cyrillic characters
+- **Smart Uniqueness** - Automatically adds suffixes (-1, -2, -3) for unique slugs
+- **Auto-discovery** - Automatically finds and processes all content types with slug fields
+- **Configurable** - Update existing slugs or keep them unchanged
+- **Admin Panel** - Beautiful settings interface with real-time configuration
+- **Zero Configuration** - Works out of the box with sensible defaults
+- **🌐 Multi-locale Support** - Choose from 8 different locales for transliteration (ru, en, de, fr, es, it, pl, tr)
+- **🎛️ Easy Configuration** - Change locale directly from admin panel without code editing
 
-## 🎯 Compatibility
-
-| Environment | Version | Status |
-|-------------|---------|--------|
-| **Strapi** | `v5.0.0+` | ✅ Fully Supported |
-| **Node.js** | `18.x, 20.x, 22.x` | ✅ Tested |
-| **NPM** | `8.x+` | ✅ Compatible |
-| **Yarn** | `1.x, 3.x+` | ✅ Compatible |
-
-### Strapi Version Support
-
-- ✅ **Strapi v5.0.0+**: Full support with all features
-- ❌ **Strapi v4.x**: Not compatible (use legacy lifecycle approach)
-- ❌ **Strapi v3.x**: Not compatible
-
-### Database Support
-
-The plugin works with all Strapi-supported databases:
-- ✅ **PostgreSQL** (Recommended)
-- ✅ **MySQL/MariaDB**
-- ✅ **SQLite** (Development only)
-
-### Rich Text Editor Support
-
-- ✅ **Blocks Editor** (Strapi v5 default) - Full support
-- ✅ **Classic Rich Text** (HTML) - Full support
-- ✅ **Markdown** fields - Treated as string
-
-### Browser Compatibility (Admin Panel)
-
-- ✅ **Chrome** 90+
-- ✅ **Firefox** 88+
-- ✅ **Safari** 14+
-- ✅ **Edge** 90+
-
-## 📦 Installation
+## 🚀 Installation
 
 ```bash
 npm install strapi-plugin-auto-slug-manager-a-mi13
@@ -59,232 +24,180 @@ npm install strapi-plugin-auto-slug-manager-a-mi13
 yarn add strapi-plugin-auto-slug-manager-a-mi13
 ```
 
-## 🛠️ Setup
-
-1. **Add to plugins configuration** (`config/plugins.js`):
-
-```javascript
-module.exports = {
-  'auto-slug-manager': {
-    enabled: true,
-  },
-};
-```
-
-2. **Restart your Strapi application**:
-
-```bash
-npm run develop
-# or
-yarn develop
-```
-
-3. **Configure via Admin Panel**: Navigate to Settings → Auto Slug Manager
-
-## 🎯 Usage
-
-### Automatic Operation
-
-The plugin automatically generates slugs for any content type with a `slug` field:
-
-```javascript
-// Creating content
-const article = await strapi.entityService.create('api::article.article', {
-  data: {
-    title: 'My Amazing Article',
-    // slug will be automatically generated as 'my-amazing-article'
-  }
-});
-```
-
-### Rich Text Support
-
-The plugin intelligently handles different field types:
-
-**1. Regular String Fields:**
-```javascript
-title: "Hello World" → slug: "hello-world"
-```
-
-**2. Rich Text Blocks (New Editor):**
-```javascript
-title: [
-  {
-    type: "paragraph",
-    children: [{ type: "text", text: "Hello World" }]
-  }
-] → slug: "hello-world"
-```
-
-**3. Classic Rich Text (HTML):**
-```javascript
-title: "<h1>Hello World</h1><p>Description</p>" → slug: "hello-world-description"
-```
-
-### Cyrillic Transliteration
-
-Perfect for Russian content:
-
-```javascript
-title: "Моя статья" → slug: "moya-statya"
-title: "Тестовая статья для слуг" → slug: "testovaya-statya-dlya-slug"
-```
-
 ## ⚙️ Configuration
 
-### Admin Panel Settings
-
-Access via **Settings → Auto Slug Manager**:
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| **Enable Plugin** | Turn on/off automatic slug generation | `true` |
-| **Source Field** | Primary field to generate slug from | `title` |
-| **Fallback Field** | Backup field if source is empty | `name` |
-| **Process Rich Text** | Extract text from Rich Text fields | `true` |
-| **Update Existing Slugs** | Update slug when source changes | `true` |
-| **Cyrillic Support** | Transliterate Cyrillic to Latin | `true` |
-
-### Available Source Fields
-
-- `title` - Most common choice
-- `name` - Alternative naming field
-- `label` - Label or display name
-- `heading` - Header or title field
-- `caption` - Caption or subtitle
-
-### Programmatic Configuration
-
-You can also configure via `config/plugins.js`:
+Add the plugin to your `config/plugins.js` or `config/plugins.ts`:
 
 ```javascript
 module.exports = {
   'auto-slug-manager': {
     enabled: true,
     config: {
-      enabled: true,
-      sourceField: 'title',
-      fallbackField: 'name',
-      handleRichText: true,
-      updateExistingSlugs: true,
-      supportCyrillic: true,
+      enabled: true,                    // Enable/disable plugin globally
+      sourceField: 'title',             // Primary field to generate slug from
+      fallbackField: 'name',            // Fallback field if primary is empty
+      handleRichText: true,             // Process Rich Text (blocks) fields
+      addSuffixForUnique: true,         // Add suffixes for uniqueness
+      supportCyrillic: true,            // Support Cyrillic transliteration
+      updateExistingSlugs: true,        // Update existing slugs when title changes
       slugifyOptions: {
         lower: true,
         strict: true,
         locale: 'ru'
       }
     }
-  },
-};
-```
-
-## 🔧 Advanced Usage
-
-### Custom Slug Generation
-
-The plugin provides hooks for custom logic:
-
-```javascript
-// In your content type lifecycle (optional)
-module.exports = {
-  async beforeCreate(event) {
-    // Plugin handles this automatically
-    // You can add custom logic here if needed
   }
 };
 ```
 
-### Content Type Requirements
+## 📖 Usage
 
-For the plugin to work, your content type must have a `slug` field:
+1. **Add a `slug` field** to any content type in your Strapi schema
+2. **Create or edit entries** - slugs will be automatically generated from `title` or `name` fields
+3. **Rich Text support** - Works with both regular string fields and Rich Text editor fields
 
-```javascript
-// In your content type schema
+### Example Content Type Schema
+
+```json
 {
+  "kind": "collectionType",
+  "collectionName": "articles",
+  "info": {
+    "singularName": "article",
+    "pluralName": "articles",
+    "displayName": "Articles"
+  },
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "blocks"
     },
     "slug": {
       "type": "uid",
-      "targetField": "title"  // Optional: Strapi admin reference
+      "targetField": "title"
     }
   }
 }
 ```
 
-## 🎨 Admin Interface
+## 🎯 How it Works
 
-The plugin includes a beautiful, modern admin interface:
+1. **Auto-discovery**: Plugin scans all content types for `slug` fields
+2. **Lifecycle hooks**: Registers `beforeCreate` and `beforeUpdate` hooks
+3. **Smart text extraction**: Automatically detects and processes different field types:
+   - **String fields** → direct text extraction
+   - **Rich Text Blocks** → extracts text from JSON structure
+   - **Classic Rich Text** → strips HTML tags and extracts clean text
+4. **Slug generation**: Uses `slugify` with Cyrillic support
+5. **Uniqueness check**: Ensures all slugs are unique within the content type
 
-- **Toggle switches** for all boolean settings
-- **Dropdown selectors** for field configuration
-- **Real-time status** showing discovered content types
-- **Save functionality** with success/error feedback
+## 🔧 API Endpoints
 
-## 🔍 Troubleshooting
+The plugin provides API endpoints for managing settings:
 
-### Plugin Not Working?
+- `GET /auto-slug-manager/settings` - Get current settings
+- `PUT /auto-slug-manager/settings` - Update settings
+- `GET /auto-slug-manager/status` - Get plugin status and discovered content types
 
-1. **Check console logs** for error messages
-2. **Verify slug field exists** in your content type
-3. **Restart Strapi** after configuration changes
-4. **Check admin panel** for plugin status
+## 📝 Field Types Supported
 
-### Common Issues
+### Rich Text Blocks (New Editor)
+```json
+{
+  "title": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "text": "My Article Title"
+        }
+      ]
+    }
+  ]
+}
+```
 
-**Slugs not generating:**
-- Ensure your content type has a `slug` field
-- Check that the source field contains text
-- Verify plugin is enabled in settings
+### Rich Text (Classic Editor)
+```json
+{
+  "title": "<h1>My Article Title</h1><p>Some description</p>"
+}
+```
 
-**Cyrillic not transliterating:**
-- Enable "Cyrillic Support" in settings
-- Check `slugifyOptions.locale` is set to 'ru'
+### Regular String
+```json
+{
+  "title": "My Article Title"
+}
+```
 
-**Duplicates not handled:**
-- Plugin automatically adds suffixes (-1, -2, -3...)
-- Check database for existing slugs
+All three will generate: `my-article-title`
 
-## 🧪 Testing
+## 🌍 Multi-locale Support
 
-The plugin includes comprehensive test examples:
+The plugin supports 8 different locales for transliteration. You can change the locale directly from the admin panel:
 
-```javascript
-// Test cases covered:
-✅ String field extraction
-✅ Rich Text Blocks processing  
-✅ Classic Rich Text (HTML) processing
-✅ Cyrillic transliteration
-✅ Unique slug generation
-✅ Update vs. preserve existing slugs
-✅ Fallback field usage
+### Available Locales
+
+| Locale | Language | Example |
+|--------|----------|---------|
+| `ru` | Russian | `Моя статья` → `moya-statya` |
+| `en` | English | `My Article` → `my-article` |
+| `de` | German | `Mein Artikel` → `mein-artikel` |
+| `fr` | French | `Mon Article` → `mon-article` |
+| `es` | Spanish | `Mi Artículo` → `mi-articulo` |
+| `it` | Italian | `Il Mio Articolo` → `il-mio-articolo` |
+| `pl` | Polish | `Mój Artykuł` → `moj-artykul` |
+| `tr` | Turkish | `Benim Makalem` → `benim-makalem` |
+
+### How to Change Locale
+
+1. **Go to Admin Panel** → Settings → Auto Slug Manager
+2. **Find "🔧 Настройки генерации слагов"** section
+3. **Select your preferred locale** from the dropdown
+4. **Click "Сохранить настройки"**
+
+### Examples
+
+**Russian locale (`ru`):**
+- `Моя статья` → `moya-statya`
+- `Тестовая запись` → `testovaya-zapis`
+
+**English locale (`en`):**
+- `My Article` → `my-article`
+- `Test Entry` → `test-entry`
+
+## 🔧 Development
+
+```bash
+# Clone the repository
+git clone https://github.com/A-mi13/strapi-plugin-auto-slug-manager
+cd strapi-plugin-auto-slug-manager
+
+# Install dependencies
+npm install
+
+# Build the plugin
+npm run build
 ```
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Contributions are welcome! Please read our contributing guidelines before submitting PRs.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see LICENSE file for details.
 
-## 🙏 Acknowledgments
+## 🐛 Issues
 
-- Built for Strapi v5.x
-- Uses [slugify](https://github.com/simov/slugify) for text processing
-- Designed for production environments
+Found a bug? Please create an issue on [GitHub](https://github.com/A-mi13/strapi-plugin-auto-slug-manager/issues).
 
-## 📞 Support
+## 📦 Related
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/A-mi13/strapi-plugin-auto-slug-manager/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/A-mi13/strapi-plugin-auto-slug-manager/discussions)
-- 📧 **Email**: alex-c13@mail.ru
+- [Strapi Documentation](https://docs.strapi.io/)
+- [Strapi Plugin Development](https://docs.strapi.io/dev-docs/plugins-development)
 
 ---
 
-**Made with ❤️ for the Strapi community**
+Made with ❤️ for the Strapi community 

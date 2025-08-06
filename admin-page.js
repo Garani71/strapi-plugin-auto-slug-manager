@@ -9,6 +9,11 @@ const SettingsPage = () => {
     addSuffixForUnique: true,
     supportCyrillic: true,
     updateExistingSlugs: true,
+    slugifyOptions: {
+      lower: true,
+      strict: true,
+      locale: 'ru'
+    }
   });
   
   const [status, setStatus] = useState(null);
@@ -362,6 +367,79 @@ const SettingsPage = () => {
             lineHeight: '1.4'
           }
         }, 'Используется, если основное поле пустое или отсутствует')
+      )
+    ),
+
+    // Настройки slugify
+    React.createElement('div', {
+      style: {
+        backgroundColor: 'white',
+        border: '1px solid #e2e8f0',
+        borderRadius: '12px',
+        padding: '2rem',
+        marginBottom: '2rem',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.07)'
+      }
+    },
+      React.createElement('h3', {
+        style: {
+          color: '#1f2937',
+          marginBottom: '1.5rem',
+          fontSize: '1.3rem',
+          fontWeight: '700'
+        }
+      }, '🔧 Настройки генерации слагов'),
+      
+      // Локаль
+      React.createElement('div', {
+        style: { marginBottom: '1.5rem' }
+      },
+        React.createElement('label', {
+          style: {
+            display: 'block',
+            fontSize: '0.95rem',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '0.5rem'
+          }
+        }, 'Локаль для транслитерации'),
+        React.createElement('select', {
+          value: settings.slugifyOptions?.locale || 'ru',
+          onChange: (e) => setSettings(prev => ({ 
+            ...prev, 
+            slugifyOptions: { 
+              ...prev.slugifyOptions, 
+              locale: e.target.value 
+            } 
+          })),
+          style: {
+            width: '100%',
+            padding: '0.875rem',
+            border: '2px solid #d1d5db',
+            borderRadius: '8px',
+            fontSize: '0.95rem',
+            backgroundColor: 'white',
+            color: '#1f2937',
+            fontWeight: '500'
+          }
+        },
+          React.createElement('option', { value: 'ru' }, 'Русская (ru)'),
+          React.createElement('option', { value: 'en' }, 'Английская (en)'),
+          React.createElement('option', { value: 'de' }, 'Немецкая (de)'),
+          React.createElement('option', { value: 'fr' }, 'Французская (fr)'),
+          React.createElement('option', { value: 'es' }, 'Испанская (es)'),
+          React.createElement('option', { value: 'it' }, 'Итальянская (it)'),
+          React.createElement('option', { value: 'pl' }, 'Польская (pl)'),
+          React.createElement('option', { value: 'tr' }, 'Турецкая (tr)')
+        ),
+        React.createElement('p', {
+          style: {
+            fontSize: '0.8rem',
+            color: '#6b7280',
+            marginTop: '0.5rem',
+            lineHeight: '1.4'
+          }
+        }, 'Локаль влияет на транслитерацию символов. Например: "ё" → "e" (ru) или "yo" (en)')
       )
     ),
 
