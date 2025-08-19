@@ -5,15 +5,15 @@ const settingsStore = require('../utils/settings-store');
 
 module.exports = ({ strapi }) => ({
   /**
-   * Извлекает текст из Rich Text блоков (тип "blocks")
-   * @param {Array} blocks - массив блоков Rich Text
-   * @returns {string} - извлеченный текст
+   * Extracts text from Rich Text blocks (type "blocks")
+   * @param {Array} blocks - array of Rich Text blocks
+   * @returns {string} - extracted text
    */
   extractTextFromBlocks(blocks) {
-    console.log('📝 [Auto Slug] Извлекаем текст из блоков:', JSON.stringify(blocks, null, 2));
+    console.log('📝 [Auto Slug] Extracting text from blocks:', JSON.stringify(blocks, null, 2));
     
     if (!blocks || !Array.isArray(blocks)) {
-      console.log('❌ [Auto Slug] Блоки пустые или не массив');
+      console.log('❌ [Auto Slug] Blocks are empty or not an array');
       return '';
     }
 
@@ -30,103 +30,103 @@ module.exports = ({ strapi }) => ({
     }
     
     const result = text.trim();
-    console.log('✅ [Auto Slug] Извлеченный текст:', result);
+    console.log('✅ [Auto Slug] Extracted text:', result);
     return result;
   },
 
   /**
-   * Извлекает текст из классического Rich Text (HTML строка)
-   * @param {string} htmlContent - HTML содержимое
-   * @returns {string} - извлеченный текст
+   * Extracts text from classic Rich Text (HTML string)
+   * @param {string} htmlContent - HTML content
+   * @returns {string} - extracted text
    */
   extractTextFromHtml(htmlContent) {
-    console.log('📝 [Auto Slug] Извлекаем текст из HTML:', htmlContent);
+    console.log('📝 [Auto Slug] Extracting text from HTML:', htmlContent);
     
     if (!htmlContent || typeof htmlContent !== 'string') {
-      console.log('❌ [Auto Slug] HTML контент пустой или не строка');
+      console.log('❌ [Auto Slug] HTML content is empty or not a string');
       return '';
     }
 
-    // Удаляем HTML теги и извлекаем чистый текст
+    // Remove HTML tags and extract plain text
     let text = htmlContent
-      .replace(/<[^>]*>/g, ' ')  // Удаляем все HTML теги
-      .replace(/&nbsp;/g, ' ')   // Заменяем неразрывные пробелы
-      .replace(/&amp;/g, '&')    // Декодируем амперсанды
-      .replace(/&lt;/g, '<')     // Декодируем < 
-      .replace(/&gt;/g, '>')     // Декодируем >
-      .replace(/&quot;/g, '"')   // Декодируем кавычки
-      .replace(/&#39;/g, "'")    // Декодируем апострофы
-      .replace(/\s+/g, ' ')      // Схлопываем множественные пробелы
-      .trim();                   // Убираем пробелы по краям
+      .replace(/<[^>]*>/g, ' ')  // Remove all HTML tags
+      .replace(/&nbsp;/g, ' ')   // Replace non-breaking spaces
+      .replace(/&amp;/g, '&')    // Decode ampersands
+      .replace(/&lt;/g, '<')     // Decode < 
+      .replace(/&gt;/g, '>')     // Decode >
+      .replace(/&quot;/g, '"')   // Decode quotes
+      .replace(/&#39;/g, "'")    // Decode apostrophes
+      .replace(/\s+/g, ' ')      // Collapse multiple spaces
+      .trim();                   // Remove leading/trailing spaces
 
     const result = text.trim();
-    console.log('✅ [Auto Slug] Извлеченный текст из HTML:', result);
+    console.log('✅ [Auto Slug] Extracted text from HTML:', result);
     return result;
   },
 
   /**
-   * Извлекает текст из поля (обычного или Rich Text)
-   * @param {any} fieldValue - значение поля
-   * @param {boolean} handleRichText - обрабатывать ли Rich Text
-   * @returns {string} - текст для генерации слага
+   * Extracts text from a field (regular or Rich Text)
+   * @param {any} fieldValue - field value
+   * @param {boolean} handleRichText - whether to process Rich Text
+   * @returns {string} - text for slug generation
    */
   extractTextFromField(fieldValue, handleRichText = true) {
     if (!fieldValue) return '';
 
-    // Если это Rich Text блоки (массив) - новый редактор
+    // If it's Rich Text blocks (array) - new editor
     if (handleRichText && Array.isArray(fieldValue)) {
-      console.log('🔍 [Auto Slug] Обнаружен Rich Text Blocks (массив)');
+      console.log('🔍 [Auto Slug] Detected Rich Text Blocks (array)');
       return this.extractTextFromBlocks(fieldValue);
     }
 
-    // Если это обычная строка
+    // If it's a regular string
     if (typeof fieldValue === 'string') {
-      // Проверяем, содержит ли строка HTML теги (классический Rich Text)
+      // Check if the string contains HTML tags (classic Rich Text)
       if (handleRichText && fieldValue.includes('<') && fieldValue.includes('>')) {
-        console.log('🔍 [Auto Slug] Обнаружен классический Rich Text (HTML)');
+        console.log('🔍 [Auto Slug] Detected classic Rich Text (HTML)');
         return this.extractTextFromHtml(fieldValue);
       }
       
-      // Обычная строка
-      console.log('🔍 [Auto Slug] Обнаружена обычная строка');
+      // Regular string
+      console.log('🔍 [Auto Slug] Detected regular string');
       return fieldValue;
     }
 
-    console.log('⚠️ [Auto Slug] Неизвестный тип поля:', typeof fieldValue, fieldValue);
+    console.log('⚠️ [Auto Slug] Unknown field type:', typeof fieldValue, fieldValue);
     return '';
   },
 
   /**
-   * Генерирует уникальный слаг
-   * @param {string} text - исходный текст
-   * @param {string} contentType - тип контента
-   * @param {string} documentId - ID документа (для исключения из проверки)
-   * @param {object} options - настройки slugify
-   * @returns {Promise<string>} - уникальный слаг
+   * Generates a unique slug
+   * @param {string} text - source text
+   * @param {string} contentType - content type
+   * @param {string} documentId - document ID (to exclude from check)
+   * @param {object} options - slugify options
+   * @returns {Promise<string>} - unique slug
    */
   async generateUniqueSlug(text, contentType, documentId = null, options = {}) {
     if (!text) {
-      console.log('⚠️ [Auto Slug] Пустой текст для генерации слага');
+      console.log('⚠️ [Auto Slug] Empty text for slug generation');
       return '';
     }
 
-    // Получаем настройки из хранилища
+    // Get settings from store
     const config = settingsStore.getSettings();
     
-    // Генерируем базовый слаг с настройками из конфигурации
+    // Generate base slug with config options
     const baseSlug = slugify(text, {
       ...config.slugifyOptions,
       ...options
     });
 
-    console.log('🔄 [Auto Slug] Базовый слаг:', baseSlug);
+    console.log('🔄 [Auto Slug] Base slug:', baseSlug);
 
-    // Проверяем уникальность
+    // Check uniqueness
     let slug = baseSlug;
     let counter = 1;
 
     while (true) {
-      // Ищем существующие записи с таким слагом
+      // Find existing entries with this slug
       const existing = await strapi.db.query(contentType).findOne({
         where: { 
           slug: slug,
@@ -135,85 +135,85 @@ module.exports = ({ strapi }) => ({
       });
 
       if (!existing) {
-        console.log('✅ [Auto Slug] Уникальный слаг найден:', slug);
+        console.log('✅ [Auto Slug] Unique slug found:', slug);
         break;
       }
 
       slug = `${baseSlug}-${counter}`;
       counter++;
-      console.log('🔄 [Auto Slug] Попытка слага:', slug);
+      console.log('🔄 [Auto Slug] Slug attempt:', slug);
     }
 
     return slug;
   },
 
   /**
-   * Генерирует слаг для записи
-   * @param {object} data - данные записи
-   * @param {string} contentType - тип контента
-   * @param {string} documentId - ID документа
-   * @returns {Promise<string|null>} - сгенерированный слаг или null
+   * Generates a slug for an entry
+   * @param {object} data - entry data
+   * @param {string} contentType - content type
+   * @param {string} documentId - document ID
+   * @returns {Promise<string|null>} - generated slug or null
    */
   async generateSlugForEntry(data, contentType, documentId = null) {
-    console.log(`🔍 [Auto Slug] generateSlugForEntry вызван для ${contentType}`);
-    console.log(`📋 [Auto Slug] Данные:`, JSON.stringify(data, null, 2));
+    console.log(`🔍 [Auto Slug] generateSlugForEntry called for ${contentType}`);
+    console.log(`📋 [Auto Slug] Data:`, JSON.stringify(data, null, 2));
     
-    // Получаем текущие настройки из хранилища
+    // Get current settings from store
     const config = settingsStore.getSettings();
-    console.log(`⚙️ [Auto Slug] Конфигурация:`, config);
+    console.log(`⚙️ [Auto Slug] Configuration:`, config);
     
-    // Проверяем, включен ли плагин глобально
+    // Check if plugin is enabled globally
     if (!config.enabled) {
-      console.log(`❌ [Auto Slug] Плагин отключен глобально`);
+      console.log(`❌ [Auto Slug] Plugin is disabled globally`);
       return null;
     }
 
-    // Проверяем, включен ли для данного content-type
+    // Check if enabled for this content-type
     const contentTypeConfig = config.contentTypes[contentType];
     if (contentTypeConfig && contentTypeConfig.enabled === false) {
-      console.log(`⚠️ [Auto Slug] Генерация отключена для ${contentType}`);
+      console.log(`⚠️ [Auto Slug] Generation disabled for ${contentType}`);
       return null;
     }
 
-    // Если слаг уже есть, проверяем настройки обновления
+    // If slug already exists, check update settings
     if (data.slug && !config.updateExistingSlugs) {
-      console.log(`⚠️ [Auto Slug] Слаг уже существует, пропускаем: "${data.slug}"`);
+      console.log(`⚠️ [Auto Slug] Slug already exists, skipping: "${data.slug}"`);
       return null;
     }
     
     if (data.slug && config.updateExistingSlugs) {
-      console.log(`🔄 [Auto Slug] Слаг существует, но обновляем согласно настройкам: "${data.slug}"`);
+      console.log(`🔄 [Auto Slug] Slug exists, but updating according to settings: "${data.slug}"`);
     }
 
-    console.log(`🔍 [Auto Slug] Ищем текст в поле "${config.sourceField}":`, data[config.sourceField]);
+    console.log(`🔍 [Auto Slug] Looking for text in field "${config.sourceField}":`, data[config.sourceField]);
 
-    // Получаем текст из основного поля
+    // Get text from main field
     let sourceText = this.extractTextFromField(
       data[config.sourceField], 
       config.handleRichText
     );
 
-    console.log(`📝 [Auto Slug] Извлеченный текст из основного поля:`, sourceText);
+    console.log(`📝 [Auto Slug] Extracted text from main field:`, sourceText);
 
-    // Если основное поле пустое, пробуем резервное
+    // If main field is empty, try fallback
     if (!sourceText && config.fallbackField) {
-      console.log(`🔍 [Auto Slug] Пробуем резервное поле "${config.fallbackField}":`, data[config.fallbackField]);
+      console.log(`🔍 [Auto Slug] Trying fallback field "${config.fallbackField}":`, data[config.fallbackField]);
       sourceText = this.extractTextFromField(
         data[config.fallbackField], 
         config.handleRichText
       );
-      console.log(`📝 [Auto Slug] Извлеченный текст из резервного поля:`, sourceText);
+      console.log(`📝 [Auto Slug] Extracted text from fallback field:`, sourceText);
     }
 
     if (!sourceText) {
-      console.log(`⚠️ [Auto Slug] Не найден текст для генерации слага в ${contentType}`);
-      console.log(`🔍 [Auto Slug] Проверенные поля: ${config.sourceField}, ${config.fallbackField}`);
+      console.log(`⚠️ [Auto Slug] No text found for slug generation in ${contentType}`);
+      console.log(`🔍 [Auto Slug] Fields checked: ${config.sourceField}, ${config.fallbackField}`);
       return null;
     }
 
-    console.log(`🚀 [Auto Slug] Генерируем слаг для ${contentType} из текста:`, sourceText);
+    console.log(`🚀 [Auto Slug] Generating slug for ${contentType} from text:`, sourceText);
 
-    // Генерируем уникальный слаг
+    // Generate unique slug
     const slug = await this.generateUniqueSlug(
       sourceText,
       contentType,
@@ -221,23 +221,23 @@ module.exports = ({ strapi }) => ({
       config.slugifyOptions
     );
 
-    console.log(`✅ [Auto Slug] Итоговый слаг:`, slug);
+    console.log(`✅ [Auto Slug] Final slug:`, slug);
     return slug;
   },
 
   /**
-   * Обрабатывает все content-types и находит те, где есть поле slug
-   * @returns {Array} - список content-types с полем slug
+   * Processes all content-types and finds those with a slug field
+   * @returns {Array} - list of content-types with slug field
    */
   getContentTypesWithSlug() {
     const contentTypes = strapi.contentTypes;
     const typesWithSlug = [];
 
     for (const [uid, contentType] of Object.entries(contentTypes)) {
-      // Пропускаем системные типы
+      // Skip system types
       if (!uid.startsWith('api::')) continue;
 
-      // Проверяем, есть ли поле slug
+      // Check if there is a slug field
       if (contentType.attributes && contentType.attributes.slug) {
         typesWithSlug.push({
           uid,
@@ -249,7 +249,7 @@ module.exports = ({ strapi }) => ({
       }
     }
 
-    console.log('📋 [Auto Slug] Найденные content-types с полем slug:', typesWithSlug);
+    console.log('📋 [Auto Slug] Found content-types with slug field:', typesWithSlug);
     return typesWithSlug;
   }
-}); 
+});
